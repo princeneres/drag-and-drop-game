@@ -1,0 +1,14 @@
+# Blueprint para deploy no Render (https://render.com).
+# Importe este repositório em "New > Blueprint" ou configure um Web Service Docker.
+services:
+  - type: web
+    name: drag-and-drop-game
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      # Defina MONGO_URI no painel do Render (string do MongoDB Atlas).
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB
+        value: project-game

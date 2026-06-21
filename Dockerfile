@@ -1,17 +1,20 @@
-# Use an official Python image as the base image
-FROM python:3.10-slim-buster
+# Imagem base oficial do Python
+FROM python:3.10-slim-bookworm
 
-# copy the requirements file into the image
-COPY . /app
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PORT=3000
 
-# switch working directory
 WORKDIR /app
 
-# install the dependencies and packages in the requirements file
+# Instala dependências primeiro (melhor cache de camadas)
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 3000
+# Copia o restante da aplicação
+COPY . .
+
 EXPOSE 3000
 
-# configure the container to run in an executed manner
-CMD ["python", "app.py"]
+# Servidor de produção (gunicorn). Onrender injeta a env $PORT.
+CMD gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 runserver:app
