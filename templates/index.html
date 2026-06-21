@@ -1,61 +1,64 @@
 {% extends 'base.html' %} {% block content %}
-<div class="container" id="themes">
-  <h3 class="title primary-color">
-    Temas <i class="bi bi-diagram-3-fill"></i>
-  </h3>
-  <hr />
-  <p class="subtitle secondary-color">Escolha um tema para jogar:</p>
-  <div class="row">
-    {% for tema in temas %}
-    <div class="col-sm-3">
-      <div class="card card-theme">
-        <div class="card-body">
-          <h5 class="card-title">{{tema.name}}</h5>
-          <p class="card-text">{{tema.description}}</p>
-          {% if not tema.private %}
-          <!--  Botão de jogar tema -->
-          <a href="/tema/{{tema._id}}">
-            <button class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="bottom">
-              <i class="bi bi-play-fill"></i>
-              <b>Jogar</b>
-            </button>
-          </a>
-          {% else %}
-          <!--  Botão de inserir senha para jogar -->
-          <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-title="Jogar"
-            data-bs-target="[id='{{tema._id}}']">
-            <i class="bi bi-lock-fill"></i>
-            <b>Jogar</b>
-          </button>
+<div id="themes">
+  <div class="page-head">
+    <h1>Escolha um <span class="accent">tema</span> 🎯</h1>
+    <p>Arraste cada item para a categoria certa antes do tempo acabar!</p>
+  </div>
 
-          <div class="modal fade" id="{{tema._id}}" tabindex="0" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <label class="form-label" for="{{tema._id}}-password"><strong>Digite a Senha:</strong></label>
-                  <input type="password" class="form-control" id="{{tema._id}}-password"
-                    placeholder="Digite uma senha" />
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
-                    Cancelar
-                  </button>
-                  <button type="button" class="btn btn-success"
-                    onclick="check_senha('{{tema.password}}', '{{tema._id}}')" data-bs-dismiss="modal">
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          {% endif %}
-        </div>
-      </div>
+  <div class="themes-grid">
+    {% for tema in temas %}
+    <div class="theme-card" style="animation-delay: {{ loop.index0 * 0.06 }}s">
+      {% if tema.private %}<span class="lock-tag">🔒</span>{% endif %}
+      <h3>{{ tema.name }}</h3>
+      <p class="desc">{{ tema.description }}</p>
+      {% if not tema.private %}
+      <a class="btn btn-success" href="/tema/{{ tema._id }}">▶ Jogar</a>
+      {% else %}
+      <button class="btn btn-warning" onclick="askPassword('{{ tema._id }}')">🔓 Jogar</button>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="empty">
+      <h3>Nenhum tema ainda 🌱</h3>
+      <p>Que tal <a href="/formulario/novo">criar o primeiro</a>?</p>
     </div>
     {% endfor %}
   </div>
 </div>
-{% endblock content %}
+
+<!-- Modal de senha -->
+<div class="modal-backdrop" id="pw-modal">
+  <div class="modal">
+    <h3>Tema privado 🔒</h3>
+    <p class="hint">Digite a senha para jogar este tema.</p>
+    <input type="password" class="input" id="pw-input" placeholder="Senha" />
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('pw-modal')">Cancelar</button>
+      <button class="btn btn-success" id="pw-confirm">Entrar</button>
+    </div>
+  </div>
+</div>
+{% endblock content %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script>
+  let pendingThemeId = null;
+  function askPassword(id) {
+    pendingThemeId = id;
+    document.getElementById("pw-input").value = "";
+    openModal("pw-modal");
+    setTimeout(() => document.getElementById("pw-input").focus(), 150);
+  }
+  document.getElementById("pw-confirm").addEventListener("click", async () => {
+    const pw = document.getElementById("pw-input").value;
+    const res = await verifyPassword(pendingThemeId, pw);
+    if (res.ok) {
+      window.location.href = `/tema/${pendingThemeId}`;
+    } else {
+      toast(res.error || "Senha incorreta!", "error");
+    }
+  });
+  document.getElementById("pw-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("pw-confirm").click();
+  });
+</script>
+{% endblock scripts %}

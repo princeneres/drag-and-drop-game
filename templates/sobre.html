@@ -1,47 +1,32 @@
-{% extends 'base.html' %} {% block content %}
-<div class="container">
-  <h3>Sobre <i class="bi bi-info-circle-fill"></i></h3>
-  <hr />
-  <div class="about-description">
-    <p>
-      Esse projeto e resultado do nosso trabalho final para conclusão do curso
-      Sistemas para Internet no
-      <b>Instituto Federal de Brasília - Campus Brasília</b> tendo como
-      orientador o professor Marx Gomes Van der Linden, esperamos que gostem e
-      se divirtam!
-    </p>
+{% extends 'base.html' %} {% block title %}Sobre — Associa!{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Sobre o <span class="accent">projeto</span> ℹ️</h1>
+</div>
+
+<div class="card-panel" style="margin-bottom: 1.6rem">
+  <p class="prose">
+    Este projeto é o resultado do nosso trabalho final de conclusão do curso de
+    <b>Sistemas para Internet</b> no
+    <b>Instituto Federal de Brasília — Campus Brasília</b>, tendo como orientador
+    o professor <b>Marx Gomes Van der Linden</b>. É um jogo educacional de
+    associação de conceitos: arraste cada item para a categoria certa antes do
+    tempo acabar. Esperamos que gostem e se divirtam! 🎓
+  </p>
+</div>
+
+<div class="people">
+  <div class="person">
+    <div class="cover"></div>
+    <img src="{{ url_for('static', filename='imgs/prince.jpeg') }}" alt="Prince Neres" />
+    <h4>Prince Neres</h4>
+    <p>Desenvolvedor Full-Stack</p>
   </div>
-  <section class="about" style="max-width: 23rem">
-    <div class="card testimonial-card mt-2 mb-3">
-      <div class="card-up aqua-gradient"></div>
-      <div class="avatar mx-auto white">
-        <img
-          src="../static/imgs/prince.jpeg"
-          class="rounded-circle img-fluid"
-          alt="woman avatar"
-        />
-      </div>
-      <div class="card-body text-center">
-        <h4 class="card-title font-weight-bold">Prince Neres</h4>
-        <hr />
-        <p><i class="fas fa-quote-left"></i>Desenvolvedor Full-Stack</p>
-      </div>
-    </div>
-    <div class="card testimonial-card mt-2 mb-3">
-      <div class="card-up aqua-gradient"></div>
-      <div class="avatar mx-auto white">
-        <img
-          src="../static/imgs/antony.png"
-          class="rounded-circle img-fluid"
-          alt="woman avatar"
-        />
-      </div>
-      <div class="card-body text-center">
-        <h4 class="card-title font-weight-bold">Antony Eduardo</h4>
-        <hr />
-        <p>Desenvolvedor Front-End</p>
-      </div>
-    </div>
-  </section>
+  <div class="person">
+    <div class="cover"></div>
+    <img src="{{ url_for('static', filename='imgs/antony.png') }}" alt="Antony Eduardo" />
+    <h4>Antony Eduardo</h4>
+    <p>Desenvolvedor Front-End</p>
+  </div>
 </div>
 {% endblock content %}

@@ -1,62 +1,43 @@
-{% extends 'base.html' %} {% block content %}
-  <div class="container" id="formulario">
-    <h3>Formulário de tema <i class="bi bi-file-text"></i></h3>
-    <hr />
-    <form class="needs-validation" novalidate>
-      <div class="mb-3 w-25">
-        <label for="name" class="form-label">
-          <strong>Nome do Tema</strong>
-        </label>
-        <input
-          id="name"
-          type="text"
-          class="form-control"
-          placeholder="Nome do tema"
-        />
-        <div class="invalid-feedback">Esse campo não pode estar em branco</div>
-      </div>
-      <div class="mb-3">
-        <label for="description" class="form-label">
-          <strong>Descrição</strong>
-        </label>
-        <textarea
-          class="form-control"
-          id="description"
-          rows="3"
-          placeholder="Descrição para o tema"
-        ></textarea>
-        <div class="invalid-feedback">Esse campo não pode estar em branco</div>
-      </div>
-      <div class="mb-3">
-        <div class="custom-control custom-checkbox private-checkbox">
-          <input type="checkbox" class="custom-control-input" id="private" />
-          <label class="custom-control-label" for="private">Privado</label>
-        </div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">
-          <strong>Categorias e Items </strong>
-          <i class="bi bi-diagram-3-fill"></i>
-        </label>
-        <p>Crie as categorias do tema e adicionae os seus items.</p>
-        <div id="groups" class="mb-3">
-          <button
-            type="button"
-            id="add-category"
-            onclick="add_categoria()"
-            class="btn btn-success"
-          >
-            Adicionar Categoria 
-            <i class="bi bi-plus"></i>
-          </button>
-        </div>
-      </div>
-      <div class="mb-3" id="create-theme">
-        <button class="btn btn-primary" onclick="criar_tema(event)">
-          Criar 
-          <i class="bi bi-pencil-square"></i>
-        </button>
-      </div>
-    </form>
+{% extends 'base.html' %} {% block title %}Criar tema — Associa!{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Criar <span class="accent">tema</span> ✏️</h1>
+  <p>Monte categorias e itens — o jogo embaralha tudo na hora de jogar.</p>
+</div>
+
+<div class="card-panel" id="theme-form" data-mode="create">
+  <div class="field">
+    <label for="name">Nome do tema</label>
+    <input id="name" class="input" placeholder="Ex.: Animais e habitats" />
   </div>
-{% endblock content %}
+
+  <div class="field">
+    <label for="description">Descrição</label>
+    <textarea id="description" class="input" placeholder="Sobre o que é este tema?"></textarea>
+  </div>
+
+  <div class="field">
+    <label class="switch">
+      <input type="checkbox" id="private" />
+      <span class="track"></span>
+      <span>Tema privado (com senha)</span>
+    </label>
+    <div id="password-wrap" class="hide" style="margin-top: 0.8rem">
+      <input type="password" id="password" class="input" placeholder="Senha do tema" />
+    </div>
+  </div>
+
+  <hr class="soft" />
+
+  <label>Categorias e itens 🧩</label>
+  <p class="hint">Entre 2 e 10 categorias, cada uma com pelo menos 1 item.</p>
+  <div id="categories"></div>
+  <button type="button" class="btn btn-primary" id="add-category">＋ Adicionar categoria</button>
+
+  <hr class="soft" />
+  <button type="button" class="btn btn-success btn-lg" id="save-theme">💾 Criar tema</button>
+</div>
+{% endblock content %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/form.js') }}"></script>
+{% endblock scripts %}

@@ -1,100 +1,87 @@
-{% extends 'base.html' %} {% block content %}
-<div class="container">
-  <div class="actions">
-    <!--  Botão de editar tema -->
-    <div class="action-item">
-      <a href="/formulario/{{tema._id}}">
-        <button class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Editar tema">
-          <b>Editar</b>
-          <i class="bi bi-pencil-fill"></i>
-        </button>
-      </a>
+{% extends 'base.html' %} {% block title %}{{ tema.name }} — Associa!{% endblock %}
+{% block content %}
+<div class="game-top">
+  <div class="page-head" style="margin: 0">
+    <h1>{{ tema.name }}</h1>
+    <p>{{ tema.description }}</p>
+  </div>
+  <div class="game-actions">
+    <a class="btn btn-ghost" href="/formulario/{{ tema._id }}">✏️ Editar</a>
+    <button class="btn btn-danger" onclick="openModal('del-modal')">🗑️ Remover</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><span class="icon">✅</span><div><div class="label">Acertos</div><div class="value" id="points">0</div></div></div>
+  <div class="stat"><span class="icon">❌</span><div><div class="label">Erros</div><div class="value" id="errors">0</div></div></div>
+  <div class="stat"><span class="icon">🏆</span><div><div class="label">Recorde</div><div class="value" id="record">{{ record.final_score or 0 }}</div></div></div>
+  <div class="stat"><span class="icon">⏱️</span><div><div class="label">Tempo</div><div class="value" id="time">30</div></div></div>
+</div>
+
+<!-- Início -->
+<div id="start" class="panel">
+  <h2>Pronto para jogar? 🚀</h2>
+  <p class="hint">Você tem 30 segundos. Cada acerto vale ponto, cada erro desconta!</p>
+  <button id="start-game" class="btn btn-success btn-lg">▶ Jogar</button>
+</div>
+
+<!-- Contagem regressiva -->
+<div id="prepare" class="panel hide">
+  <p class="hint">Prepare-se...</p>
+  <div class="countdown" id="countdown">3</div>
+</div>
+
+<!-- Tabuleiro -->
+<div id="board-game" class="hide">
+  <div class="board">
+    <div>
+      <p class="tray-title">🧲 Arraste os itens</p>
+      <div class="tray" id="items">
+        {% for item in items %}
+        <div class="chip" data-name="{{ item.name }}" data-category="{{ item.category }}">{{ item.name }}</div>
+        {% endfor %}
+      </div>
     </div>
-    <!--  Botão de remover tema -->
-    <div class="action-item">
-      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-title="Remover Tema"
-        data-bs-target="[id='{{tema._id}}']">
-        <b>Remover</b>
-        <i class="bi bi-trash-fill"></i>
-      </button>
-    </div>
-    <!--  Modal para confirmar deleção no banco -->
-    <div class="modal fade" id="{{tema._id}}" tabindex="0" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">Confirmar remoção?</div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
-              Cancelar
-            </button>
-            <button type="button" class="btn btn-success" onclick="remover_tema('{{tema._id}}')"
-              data-bs-dismiss="modal">
-              Confirmar
-            </button>
-          </div>
+    <div>
+      <p class="cats-title">📦 Solte na categoria certa</p>
+      <div class="cats" id="categories">
+        {% for category in categories %}
+        <div class="category" data-name="{{ category.name }}">
+          <h4>{{ category.name }}</h4>
+          <div class="drops"></div>
         </div>
+        {% endfor %}
       </div>
-    </div>
-  </div>
-  <div class="activity">
-    <h3 class="activity-name">{{tema.name}}</h3>
-    <p class="activity-description">{{tema.description}}</p>
-  </div>
-  <div class="infos">
-    <h5><i class="bi bi-check"></i> Pontuação: <span class="badge bg-secondary" id="points">0</span></h5>
-    <h5><i class="bi bi-x"></i> Erros: <span class="badge bg-secondary" id="errors">0</span></h5>
-    <h5><i class="bi bi-trophy-fill"></i> Recorde: <span class="badge bg-secondary" id="record">{{record.final_score or
-        0}}</span></h5>
-    <h5><i class="bi bi-hourglass-split"></i> Tempo: <span class="badge bg-secondary" id="time">0</span></h5>
-  </div>
-  <!-- Ínicio de jogo -->
-  <div id="start" class="box">
-    <button id="start-game" type="button" class="btn btn-success">
-      <i class="bi bi-play-fill"></i>
-      <b> Jogar</b>
-    </button>
-  </div>
-  <!-- Preparação -->
-  <div id="start" class="box hide"></div>
-  <!-- Reset -->
-  <div id="reset" class="box hide">
-    <button id="start-game" type="button" class="btn btn-success">
-      <b>Resetar </b>
-      <i class="bi bi-arrow-repeat"></i>
-    </button>
-  </div>
-  <!-- Fim do jogo -->
-  <div id="end" class="box hide">
-    <h3>Fim do Jogo</h3>
-    <h5 id="score-show"></h5>
-    <button id="start-game" type="button" class="btn btn-success">
-      <i class="bi bi-play-fill"></i>
-      <b> Jogar Novamente</b></button>
-  </div>
-  <!-- Area do jogo -->
-  <div class="board-game hide" id="board-game">
-    <div class="items">
-      {% for item in items %}
-      <div class="item" item="{{ item.name }}" categoria="{{ item.category }}">
-        <h5>{{ item.name }}</h5>
-      </div>
-      {% endfor %}
-    </div>
-    <div class="categorias">
-      {% for category in categories %}
-      <div class="categoria" name="{{ category.name }}">
-        <h4>{{category.name}}</h4>
-      </div>
-      {% endfor %}
     </div>
   </div>
 </div>
 
-<script type=text/javascript>
-  const categories_json = {{ categories | tojson }}
-  localStorage.setItem("categories", JSON.stringify(categories_json))
+<!-- Fim -->
+<div id="end" class="panel hide">
+  <h2>Fim do jogo! 🎉</h2>
+  <p class="value" id="score-show" style="font-size: 2.4rem; color: var(--coral)"></p>
+  <button id="play-again" class="btn btn-success btn-lg">🔁 Jogar novamente</button>
+</div>
+
+<!-- Modal remover -->
+<div class="modal-backdrop" id="del-modal">
+  <div class="modal">
+    <h3>Remover tema?</h3>
+    <p class="hint">Essa ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('del-modal')">Cancelar</button>
+      <button class="btn btn-danger" id="confirm-delete">Remover</button>
+    </div>
+  </div>
+</div>
+{% endblock content %} {% block scripts %}
+<script>
+  window.GAME = {
+    themeId: "{{ tema._id }}",
+    itemsCount: {{ items | length }},
+    duration: 30,
+  };
 </script>
-{% endblock content %}
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+{% endblock scripts %}

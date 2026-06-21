@@ -1,133 +1,46 @@
-{% extends 'base.html' %} {% block content %}
-  <div class="container" id="edicao">
-    <h3>Formulário de tema</h3>
-    <hr />
-    <form class="needs-validation" novalidate>
-      <div class="mb-3 w-25">
-        <label for="name" class="form-label">
-          <strong>Nome do Tema</strong>
-        </label>
-        <input
-          id="name"
-          type="text"
-          class="form-control"
-          placeholder="Nome do tema"
-          value="{{tema.name}}"
-        />
-        <div class="invalid-feedback">Esse campo não pode estar em branco</div>
-      </div>
-      <div class="mb-3">
-        <label for="description" class="form-label">
-          <strong>Descrição</strong>
-        </label>
-        <textarea 
-          class="form-control"
-          id="description"
-          rows="3"
-          placeholder="Descrição para o tema"
-        >{{tema.description}}</textarea>
-        <div class="invalid-feedback">Esse campo não pode estar em branco</div>
-      </div>
-      <div class="mb-3">
-        {% if tema.private %}
-          <div class="custom-control custom-checkbox private-checkbox">
-            <input
-              type="checkbox"
-              class="custom-control-input"
-              id="private"
-              checked
-            />
-            <label class="custom-control-label" for="private">Privado</label>
-          </div>
-          <div id="password-input">
-            <label class="form-label" for="password"><strong>Senha:</strong></label>
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              placeholder="Digite uma senha"
-              value="{{tema.password}}"
-            />
-          </div>
-        {% else %}
-          <div class="custom-control custom-checkbox private-checkbox">
-            <input type="checkbox" class="custom-control-input" id="private" />
-            <label class="custom-control-label" for="private">Privado</label>
-          </div>
-        {% endif %}
-      </div>
-      <div class="mb-3">
-        <label class="form-label">
-          <strong>Categorias e Items </strong>
-          <i class="bi bi-diagram-3-fill"></i>
-        </label>
-        <p>Crie as categorias do tema e adicione os seus items.</p>
-        <div id="groups" class="mb-3">
-          {% with categories=tema.categories %} 
-            {% for category in categories %}
-              <div id="category-input">
-                <button
-                  type="button"
-                  id="remove-category"
-                  class="btn btn-danger"
-                  onclick="remove_categoria(this)"
-                >
-                  <i class="bi bi-trash-fill"></i>
-                </button>
-                <input
-                  id="category-name"
-                  class="form-control"
-                  placeholder="Categoria"
-                  value="{{category.name}}"
-                />
-                <button
-                  type="button"
-                  id="add-item"
-                  onclick="add_item(this)"
-                  class="btn btn-primary"
-                >
-                  <i class="bi bi-plus"></i>
-                </button>
-            {% with items=category['items'] %}
-              {% for item in items %}
-                <div id="item-input">
-                  <input
-                    id="item-name"
-                    class="form-control"
-                    placeholder="Item da Categoria"
-                    value="{{item.name}}"
-                  />
-                  <button
-                    type="button"
-                    id="remove-item"
-                    class="btn btn-danger"
-                    onclick="remove_item(this)"
-                  >
-                    <i class="bi bi-trash-fill"></i>
-                  </button>
-                </div>
-              {% endfor %}
-            {% endwith %}
-              </div>
-            {% endfor %} 
-          {% endwith %}
-          <button
-            type="button"
-            id="add-category"
-            class="btn btn-success"
-            onclick="add_categoria()"
-          >
-            Adicionar Categoria 
-            <i class="bi bi-plus"></i>
-          </button>
-        </div>
-      </div>
-      <div class="mb-3" id="update-theme">
-        <button class="btn btn-primary" onclick="editar_tema('{{tema._id}}', event)">
-          Salvar 
-          <i class="bi bi-save2"></i>
-        </button>
-      </div>
-    </form>
+{% extends 'base.html' %} {% block title %}Editar {{ tema.name }} — Associa!{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Editar <span class="accent">tema</span> ✏️</h1>
+  <p>Ajuste o que quiser e salve as mudanças.</p>
+</div>
+
+<div class="card-panel" id="theme-form" data-mode="edit" data-id="{{ tema._id }}">
+  <div class="field">
+    <label for="name">Nome do tema</label>
+    <input id="name" class="input" value="{{ tema.name }}" />
   </div>
-{% endblock content %}
+
+  <div class="field">
+    <label for="description">Descrição</label>
+    <textarea id="description" class="input">{{ tema.description }}</textarea>
+  </div>
+
+  <div class="field">
+    <label class="switch">
+      <input type="checkbox" id="private" {{ 'checked' if tema.private }} />
+      <span class="track"></span>
+      <span>Tema privado (com senha)</span>
+    </label>
+    <div id="password-wrap" class="{{ '' if tema.private else 'hide' }}" style="margin-top: 0.8rem">
+      <input type="password" id="password" class="input" placeholder="Deixe em branco para manter a senha atual" />
+    </div>
+  </div>
+
+  <hr class="soft" />
+
+  <label>Categorias e itens 🧩</label>
+  <p class="hint">Entre 2 e 10 categorias, cada uma com pelo menos 1 item.</p>
+  <div id="categories"></div>
+  <button type="button" class="btn btn-primary" id="add-category">＋ Adicionar categoria</button>
+
+  <hr class="soft" />
+  <button type="button" class="btn btn-success btn-lg" id="save-theme">💾 Salvar alterações</button>
+</div>
+{% endblock content %} {% block scripts %}
+<script>
+  window.THEME_DATA = {{ tema.categories | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/form.js') }}"></script>
+{% endblock scripts %}
